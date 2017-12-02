@@ -18,7 +18,7 @@ mutation_probability = float(args[5])
 enable_logging = 1
 
 # enable stdout info
-enable_stdout = 0
+enable_stdout = 1
 
 
 def main():
@@ -72,7 +72,7 @@ def main():
         # repair population ----------------------------------------------
         # O(|V| * |V| * population_size)
         for i in population:
-            repair_solution(i, adjacency_matrix)
+            repair_solution_2(i, adjacency_matrix,vertex_weights)
         # ----------------------------------------------------------------
 
         # evaluate fitness & selecting probabilities & find get best------
@@ -176,15 +176,53 @@ def repair_solution(solution, adjacency_matrix):
                             break
 
 
-def repair_solution_2(solution, adjacency_matrix):
+def repair_solution_2(solution, adjacency_matrix, vertex_weights):
+    # Solutions are repaired greedly according to gain value
+    # Gain value for vertex x = (sum of weights of all vertexes that has edge with x)  -  (weight of x)
+    # After every removal gains are recalculated.
     # O(|V| * |V|)
-    for i in range(len(solution)):
+    length = len(solution)
+    number_of_connections = [0 for x in  range(length)]
+    gain = [0 for x in range(len(solution))]
+    inner_adjacency_matrix = [[0 for x in range(length)] for y in range(length)]
+    valid_solution = True
+    # O(|V| * |V|)
+    for i in range(length):
         if solution[i] == 1:
-            for j in range(len(solution)):
+            for j in range(length):
                 if solution[j] == 1:
-                        if adjacency_matrix[i][j] == 1:
-                            solution[i] = 0
-                            break
+                    gain[i] = vertex_weights[i]
+                    if adjacency_matrix[i][j] == 1:
+                        valid_solution = False
+                        number_of_connections[i] += 1
+                        gain[i] += vertex_weights[j]
+                        inner_adjacency_matrix[i][j] = 1
+
+    # O(|V| * |V|)
+    while not valid_solution:
+        # find max gain
+        # O(|V|)
+        max_gain = -999999999999999999
+        max_gain_i = -1
+        valid_solution = True
+        for i in range(length):
+            if number_of_connections[i] > 0:
+                valid_solution = False
+                if gain[i] > max_gain:
+                    max_gain = gain[i]
+                    max_gain_i = i
+
+        # remove vertex from solution recalculate gain etc.
+        # O(|V|)
+        if max_gain_i is not -1:
+            solution[max_gain_i] = 0
+            number_of_connections[max_gain_i] = 0
+            for i in range(length):
+                if inner_adjacency_matrix[i][max_gain_i] is not 0:
+                    inner_adjacency_matrix[i][max_gain_i] = 0
+                    number_of_connections[i] -= 1
+                    gain[i] -= vertex_weights[max_gain_i]
+
 
 
 def crossover(solution1, solution2):
