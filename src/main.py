@@ -17,6 +17,9 @@ mutation_probability = float(args[5])
 # enable logging experiments to files
 enable_logging = 1
 
+# enable stdout info
+enable_stdout = 0
+
 
 def main():
     print("hello world")
@@ -94,7 +97,8 @@ def main():
         average = sum_of_fitness_values / float(len(fitness_values))
         logs_avg[k] = str(average) + "\n"
         logs_best[k] = str(current_best) + "\n"
-        print("gen : " + str(k) + "  average : " + str(average) + "  best : " + str(current_best))
+        if enable_stdout == 1:
+            print("gen : " + str(k) + "  average : " + str(average) + "  best : " + str(current_best))
         # ----------------------------------------------------------------
 
         # create mating pool-----------------------------------------------
