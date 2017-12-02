@@ -1,7 +1,8 @@
 import subprocess
 
-names_of_the_graph_file = ["../inputs/003.txt"]
-# names_of_the_graph_file = ["003.txt", "015.txt", "030.txt"]
+names_of_the_graph_file = ["../inputs/015.txt", "../inputs/030.txt"]
+# names_of_the_graph_file = ["../inputs/003.txt", "../inputs/015.txt", "../inputs/030.txt"]
+
 number_of_generations = ["50", "200", "400"]
 population_sizes = ["100", "200"]
 crossover_probabilities = ["0.6", "0.9"]

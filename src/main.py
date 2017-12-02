@@ -137,7 +137,12 @@ def main():
         if not os.path.exists("../logs/" + input_file_name):
             os.makedirs("../logs/" + input_file_name)
 
-        file_name = "../logs/" + input_file_name + "/" + input_file_name + "_g" + str(
+        if not os.path.exists("../logs/" + input_file_name + "/avg"):
+            os.makedirs("../logs/" + input_file_name + "/avg")
+        if not os.path.exists("../logs/" + input_file_name + "/best"):
+            os.makedirs("../logs/" + input_file_name + "/best")
+
+        file_name = "../logs/" + input_file_name + "/" + "/avg/" + input_file_name + "_g" + str(
             number_of_generations) + "_p" + str(population_size) + "_c" + str(crossover_probability) + "_m" + str(
             mutation_probability) + "_avg"
         f = open(file_name + ".csv", 'w')
@@ -145,7 +150,7 @@ def main():
             f.write(i)
         f.close()
 
-        file_name = "../logs/" + input_file_name + "/" + input_file_name + "_g" + str(
+        file_name = "../logs/" + input_file_name + "/" + "/best/" + input_file_name + "_g" + str(
             number_of_generations) + "_p" + str(population_size) + "_c" + str(crossover_probability) + "_m" + str(
             mutation_probability) + "_best"
         f = open(file_name + ".csv", 'w')
