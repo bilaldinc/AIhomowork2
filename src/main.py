@@ -1,12 +1,21 @@
 import random
+import os
+import sys
 
-name_of_the_graph_file = "../inputs/003.txt"
-number_of_generations = 5
-population_size = 200
-crossover_probability = 0.6
-mutation_probability = 0.02
-log = 1
 
+args = sys.argv
+if len(args) < 2:
+    print("missing arguments")
+    exit(1)
+
+name_of_the_graph_file = args[1]
+number_of_generations = int(args[2])
+population_size = int(args[3])
+crossover_probability = float(args[4])
+mutation_probability = float(args[5])
+
+# enable logging experiments to files
+enable_logging = 1
 
 
 def main():
@@ -35,7 +44,8 @@ def main():
 
         counter += 1
 
-    logs = number_of_generations * [None]
+    logs_avg = number_of_generations * [None]
+    logs_best = number_of_generations * [None]
     # ----------------------------------------------------------------
 
     # create initial population --------------------------------------
@@ -82,7 +92,8 @@ def main():
 
         # print & log average---------------------------------------------
         average = sum_of_fitness_values / float(len(fitness_values))
-        logs[k] = str(average) + "," + str(current_best) + "\n"
+        logs_avg[k] = str(average) + "\n"
+        logs_best[k] = str(current_best) + "\n"
         print("gen : " + str(k) + "  average : " + str(average) + "  best : " + str(current_best))
         # ----------------------------------------------------------------
 
@@ -115,14 +126,30 @@ def main():
             population[i] = list(mating_pool[i])
 
     # logging the experiment
-    if log == 1:
-        file_name = name_of_the_graph_file + "_g" + str(number_of_generations) + "_p" + str(population_size) + "_c" + str(crossover_probability) + "_m" + str(mutation_probability)
+    input_file_name = os.path.basename(name_of_the_graph_file).split(".")[0]
+    if enable_logging == 1:
+        if not os.path.exists("../logs"):
+            os.makedirs("../logs")
+        if not os.path.exists("../logs/" + input_file_name):
+            os.makedirs("../logs/" + input_file_name)
+
+        file_name = "../logs/" + input_file_name + "/" + input_file_name + "_g" + str(
+            number_of_generations) + "_p" + str(population_size) + "_c" + str(crossover_probability) + "_m" + str(
+            mutation_probability) + "_avg"
         f = open(file_name + ".csv", 'w')
-        for i in logs:
+        for i in logs_avg:
             f.write(i)
         f.close()
 
-        f = open(file_name + "_best" + ".csv", 'w')
+        file_name = "../logs/" + input_file_name + "/" + input_file_name + "_g" + str(
+            number_of_generations) + "_p" + str(population_size) + "_c" + str(crossover_probability) + "_m" + str(
+            mutation_probability) + "_best"
+        f = open(file_name + ".csv", 'w')
+        for i in logs_best:
+            f.write(i)
+        f.close()
+
+        f = open(file_name + "_solution" + ".csv", 'w')
         f.write("maximum fitness : " + str(maximum_fitness) + "\n")
         for i in best_solution:
             f.write(str(i) + "\n")
