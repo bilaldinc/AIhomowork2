@@ -1,10 +1,11 @@
 import random
 
 name_of_the_graph_file = "../inputs/003.txt"
-number_of_generations = 400
+number_of_generations = 5
 population_size = 200
 crossover_probability = 0.6
 mutation_probability = 0.02
+log = 1
 
 
 
@@ -17,7 +18,6 @@ def main():
     f.close()
 
     number_of_nodes = int(lines[0])
-    number_of_edges = float(lines[1])
     adjacency_matrix = [[0 for x in range(number_of_nodes)] for y in range(number_of_nodes)]
     vertex_weights = [0 for x in range(number_of_nodes)]
 
@@ -34,6 +34,8 @@ def main():
             adjacency_matrix[x][y] = 1
 
         counter += 1
+
+    logs = number_of_generations * [None]
     # ----------------------------------------------------------------
 
     # create initial population --------------------------------------
@@ -60,27 +62,28 @@ def main():
             repair_solution(i, adjacency_matrix)
         # ----------------------------------------------------------------
 
-        # evaluate fitness & selecting probabilities----------------------
+        # evaluate fitness & selecting probabilities & find get best------
         # O(|V| * population_size)
         sum_of_fitness_values = 0
         for i in range(population_size):
             fitness_values[i] = calculate_fitness(population[i], vertex_weights)
             sum_of_fitness_values += fitness_values[i]
         cumsum = 0
+        current_best = -1.0
         for i in range(population_size):
             cumsum += fitness_values[i]
             cumulative_probabilities[i] = cumsum / sum_of_fitness_values
-        # ----------------------------------------------------------------
-
-        # find best solution in the population print average--------------
-        # O(population_size)
-        for i in range(len(fitness_values)):
             if fitness_values[i] > maximum_fitness:
                 maximum_fitness = fitness_values[i]
                 best_solution = population[i]
+            if fitness_values[i] > current_best:
+                current_best = fitness_values[i]
+        # ----------------------------------------------------------------
 
-        average = sum(fitness_values) / float(len(fitness_values))
-        print("gen : " + str(k) + "  average : " + str(average) + "  best : " + str(maximum_fitness))
+        # print & log average---------------------------------------------
+        average = sum_of_fitness_values / float(len(fitness_values))
+        logs[k] = str(average) + "," + str(current_best) + "\n"
+        print("gen : " + str(k) + "  average : " + str(average) + "  best : " + str(current_best))
         # ----------------------------------------------------------------
 
         # create mating pool-----------------------------------------------
@@ -111,19 +114,19 @@ def main():
         for i in range(population_size):
             population[i] = list(mating_pool[i])
 
-    # after limit is reached to get average, repair and calculate-----
-    for i in population:
-        repair_solution(i, adjacency_matrix)
-    for i in range(population_size):
-        fitness_values[i] = calculate_fitness(population[i], vertex_weights)
-    for i in range(len(fitness_values)):
-        if fitness_values[i] > maximum_fitness:
-            maximum_fitness = fitness_values[i]
-            best_solution = population[i]
+    # logging the experiment
+    if log == 1:
+        file_name = name_of_the_graph_file + "_g" + str(number_of_generations) + "_p" + str(population_size) + "_c" + str(crossover_probability) + "_m" + str(mutation_probability)
+        f = open(file_name + ".csv", 'w')
+        for i in logs:
+            f.write(i)
+        f.close()
 
-    average = sum(fitness_values) / float(len(fitness_values))
-    print("average : " + str(average) + "  best : " + str(maximum_fitness))
-    # ----------------------------------------------------------------
+        f = open(file_name + "_best" + ".csv", 'w')
+        f.write("maximum fitness : " + str(maximum_fitness) + "\n")
+        for i in best_solution:
+            f.write(str(i) + "\n")
+        f.close()
 
 
 def repair_solution(solution, adjacency_matrix):
