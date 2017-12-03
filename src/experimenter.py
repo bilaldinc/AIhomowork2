@@ -1,14 +1,14 @@
 import subprocess
 
-names_of_the_graph_file = ["../inputs/015.txt", "../inputs/030.txt"]
-# names_of_the_graph_file = ["../inputs/003.txt", "../inputs/015.txt", "../inputs/030.txt"]
+# names_of_the_graph_file = ["../inputs/015.txt", "../inputs/03  0.txt  "]
+names_of_the_graph_file = ["../inputs/003.txt", "../inputs/015.txt", "../inputs/030.txt"]
 
 number_of_generations = ["50", "200", "400"]
 population_sizes = ["100", "200"]
 crossover_probabilities = ["0.6", "0.9"]
 mutation_probabilities = ["0.2", "0.02"]
 
-maximum_concurrent_process = 5
+maximum_concurrent_process = 35
 processes = []
 processes_wait = []
 

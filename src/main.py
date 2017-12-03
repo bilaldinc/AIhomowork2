@@ -72,8 +72,8 @@ def main():
         # repair population ----------------------------------------------
         # O(|V| * |V| * population_size)
         for i in population:
-            repair_solution_2(i, adjacency_matrix, vertex_weights)
-            # repair_solution_1(i, adjacency_matrix, vertex_weights)
+            # repair_solution_2(i, adjacency_matrix, vertex_weights)
+            repair_solution_1(i, adjacency_matrix, vertex_weights)
             # repair_solution_0(i, adjacency_matrix)
         # ----------------------------------------------------------------
         # evaluate fitness & selecting probabilities & find get best------
