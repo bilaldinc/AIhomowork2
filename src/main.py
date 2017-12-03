@@ -31,7 +31,7 @@ def main():
 
     number_of_nodes = int(lines[0])
     adjacency_matrix = [[0 for x in range(number_of_nodes)] for y in range(number_of_nodes)]
-    vertex_weights = [0 for x in range(number_of_nodes)]
+    vertex_weights = [0.0 for x in range(number_of_nodes)]
 
     counter = 0
     for i in lines[2:]:
@@ -72,9 +72,9 @@ def main():
         # repair population ----------------------------------------------
         # O(|V| * |V| * population_size)
         for i in population:
-            repair_solution_2(i, adjacency_matrix,vertex_weights)
+            removed = repair_solution_2(i, adjacency_matrix, vertex_weights)
+            # removed = repair_solution(i, adjacency_matrix)
         # ----------------------------------------------------------------
-
         # evaluate fitness & selecting probabilities & find get best------
         # O(|V| * population_size)
         sum_of_fitness_values = 0
@@ -167,31 +167,35 @@ def main():
 
 def repair_solution(solution, adjacency_matrix):
     # O(|V| * |V|)
+    total_removed_vertex = 0
     for i in range(len(solution)):
         if solution[i] == 1:
             for j in range(len(solution)):
                 if solution[j] == 1:
                         if adjacency_matrix[i][j] == 1:
                             solution[i] = 0
+                            total_removed_vertex += 1
                             break
+    return total_removed_vertex
 
 
 def repair_solution_2(solution, adjacency_matrix, vertex_weights):
-    # Solutions are repaired greedly according to gain value
+    # Nodes are removed greedly according to gain value
     # Gain value for vertex x = (sum of weights of all vertexes that has edge with x)  -  (weight of x)
     # After every removal gains are recalculated.
     # O(|V| * |V|)
     length = len(solution)
     number_of_connections = [0 for x in  range(length)]
-    gain = [0 for x in range(len(solution))]
+    gain = [0.0 for x in range(len(solution))]
     inner_adjacency_matrix = [[0 for x in range(length)] for y in range(length)]
     valid_solution = True
+    total_removed_vertex = 0
     # O(|V| * |V|)
     for i in range(length):
         if solution[i] == 1:
+            gain[i] = - vertex_weights[i]
             for j in range(length):
                 if solution[j] == 1:
-                    gain[i] = vertex_weights[i]
                     if adjacency_matrix[i][j] == 1:
                         valid_solution = False
                         number_of_connections[i] += 1
@@ -202,27 +206,38 @@ def repair_solution_2(solution, adjacency_matrix, vertex_weights):
     while not valid_solution:
         # find max gain
         # O(|V|)
-        max_gain = -999999999999999999
+        max_gain = 0
         max_gain_i = -1
         valid_solution = True
         for i in range(length):
             if number_of_connections[i] > 0:
                 valid_solution = False
-                if gain[i] > max_gain:
+                # there are many arithmetic operation is performed on gain and floating point numbers are not ...
+                # ... commutative. Initial equality may have been violated
+                if gain[i] >= max_gain or (abs(gain[i] - max_gain) < 0.001):
                     max_gain = gain[i]
                     max_gain_i = i
+
+        # don't erase this control
+        if (max_gain_i is -1) and (valid_solution is False):
+            print("stop ! ERROR")
 
         # remove vertex from solution recalculate gain etc.
         # O(|V|)
         if max_gain_i is not -1:
             solution[max_gain_i] = 0
+            gain[max_gain_i] = -vertex_weights[max_gain_i]
             number_of_connections[max_gain_i] = 0
+            total_removed_vertex += 1
             for i in range(length):
                 if inner_adjacency_matrix[i][max_gain_i] is not 0:
                     inner_adjacency_matrix[i][max_gain_i] = 0
                     number_of_connections[i] -= 1
                     gain[i] -= vertex_weights[max_gain_i]
+            for i in range(length):
+                inner_adjacency_matrix[max_gain_i][i] = 0
 
+    return total_removed_vertex
 
 
 def crossover(solution1, solution2):
@@ -250,5 +265,17 @@ def calculate_fitness(solution, vertex_weights):
         summation += solution[i] * vertex_weights[i]
     return summation
 
+
+def check_solution_validity(solution, adjacency_matrix):
+    # O(|V| * |V|)
+    result = True
+    for i in range(len(solution)):
+        if solution[i] == 1:
+            for j in range(len(solution)):
+                if solution[j] == 1:
+                        if adjacency_matrix[i][j] == 1:
+                            return False
+
+    return result
 
 main()
