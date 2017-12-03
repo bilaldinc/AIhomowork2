@@ -72,8 +72,9 @@ def main():
         # repair population ----------------------------------------------
         # O(|V| * |V| * population_size)
         for i in population:
-            removed = repair_solution_2(i, adjacency_matrix, vertex_weights)
-            # removed = repair_solution(i, adjacency_matrix)
+            repair_solution_2(i, adjacency_matrix, vertex_weights)
+            # repair_solution_1(i, adjacency_matrix, vertex_weights)
+            # repair_solution_0(i, adjacency_matrix)
         # ----------------------------------------------------------------
         # evaluate fitness & selecting probabilities & find get best------
         # O(|V| * population_size)
@@ -165,7 +166,46 @@ def main():
         f.close()
 
 
-def repair_solution(solution, adjacency_matrix):
+def crossover(solution1, solution2):
+    # O(|V|)
+    length = len(solution1)
+    point = int(random.random() * (length - 1)) + 1
+    for i in range(length):
+        if i < point:
+            temp = solution1[i]
+            solution1[i] = solution2[i]
+            solution2[i] = temp
+
+
+def mutation(solution):
+    # O(|V|)
+    for i in random.sample(range(0, len(solution)), 10):
+        # flip
+        solution[i] = 1 - solution[i]
+
+
+def calculate_fitness(solution, vertex_weights):
+    # O(|V|)
+    summation = 0
+    for i in range(len(solution)):
+        summation += solution[i] * vertex_weights[i]
+    return summation
+
+
+def check_solution_validity(solution, adjacency_matrix):
+    # O(|V| * |V|)
+    result = True
+    for i in range(len(solution)):
+        if solution[i] == 1:
+            for j in range(len(solution)):
+                if solution[j] == 1:
+                        if adjacency_matrix[i][j] == 1:
+                            return False
+
+    return result
+
+
+def repair_solution_0(solution, adjacency_matrix):
     # O(|V| * |V|)
     total_removed_vertex = 0
     for i in range(len(solution)):
@@ -176,6 +216,54 @@ def repair_solution(solution, adjacency_matrix):
                             solution[i] = 0
                             total_removed_vertex += 1
                             break
+    return total_removed_vertex
+
+
+def repair_solution_1(solution, adjacency_matrix, vertex_weights):
+    # Nodes are removed greedly according to number of edges
+    # O(|V| * |V|)
+    length = len(solution)
+    number_of_connections = [0 for x in  range(length)]
+    inner_adjacency_matrix = [[0 for x in range(length)] for y in range(length)]
+    valid_solution = True
+    total_removed_vertex = 0
+    # O(|V| * |V|)
+    for i in range(length):
+        if solution[i] == 1:
+            for j in range(length):
+                if solution[j] == 1:
+                    if adjacency_matrix[i][j] == 1:
+                        valid_solution = False
+                        number_of_connections[i] += 1
+                        inner_adjacency_matrix[i][j] = 1
+
+    # O(|V| * |V|)
+    while not valid_solution:
+        # find max gain
+        # O(|V|)
+        max_edge = 0
+        max_edge_i = -1
+        valid_solution = True
+        for i in range(length):
+            if number_of_connections[i] > 0:
+                valid_solution = False
+                if number_of_connections[i] >= max_edge:
+                    max_edge = number_of_connections[i]
+                    max_edge_i = i
+
+        # remove vertex from solution etc.
+        # O(|V|)
+        if max_edge_i is not -1:
+            solution[max_edge_i] = 0
+            number_of_connections[max_edge_i] = 0
+            total_removed_vertex += 1
+            for i in range(length):
+                if inner_adjacency_matrix[i][max_edge_i] is not 0:
+                    inner_adjacency_matrix[i][max_edge_i] = 0
+                    number_of_connections[i] -= 1
+            for i in range(length):
+                inner_adjacency_matrix[max_edge_i][i] = 0
+
     return total_removed_vertex
 
 
@@ -239,43 +327,5 @@ def repair_solution_2(solution, adjacency_matrix, vertex_weights):
 
     return total_removed_vertex
 
-
-def crossover(solution1, solution2):
-    # O(|V|)
-    length = len(solution1)
-    point = int(random.random() * (length - 1)) + 1
-    for i in range(length):
-        if i < point:
-            temp = solution1[i]
-            solution1[i] = solution2[i]
-            solution2[i] = temp
-
-
-def mutation(solution):
-    # O(|V|)
-    for i in random.sample(range(0, len(solution)), 10):
-        # flip
-        solution[i] = 1 - solution[i]
-
-
-def calculate_fitness(solution, vertex_weights):
-    # O(|V|)
-    summation = 0
-    for i in range(len(solution)):
-        summation += solution[i] * vertex_weights[i]
-    return summation
-
-
-def check_solution_validity(solution, adjacency_matrix):
-    # O(|V| * |V|)
-    result = True
-    for i in range(len(solution)):
-        if solution[i] == 1:
-            for j in range(len(solution)):
-                if solution[j] == 1:
-                        if adjacency_matrix[i][j] == 1:
-                            return False
-
-    return result
 
 main()
