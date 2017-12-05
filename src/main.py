@@ -1,7 +1,7 @@
 import random
 import os
 import sys
-
+import math
 
 args = sys.argv
 if len(args) < 2:
@@ -13,17 +13,27 @@ number_of_generations = int(args[2])
 population_size = int(args[3])
 crossover_probability = float(args[4])
 mutation_probability = float(args[5])
+initial_adding_probability = float(args[6])
+temperature_size_divisor = float(args[7])
+repair_function_type = int(args[8])
+temperature = 0.0
+
+if temperature_size_divisor == -1:
+    temperature = population_size
+elif temperature_size_divisor == -2:
+    # do not use this method. Use tournament method instead
+    temperature = -1
+else:
+    temperature = population_size / temperature_size_divisor
 
 # enable logging experiments to files
 enable_logging = 1
 
 # enable stdout info
-enable_stdout = 1
+enable_stdout = 0
 
 
 def main():
-    print("hello world")
-
     # read file ------------------------------------------------------
     f = open(name_of_the_graph_file, 'r')
     lines = f.readlines()
@@ -57,7 +67,11 @@ def main():
     for i in range(population_size):
         example_solution = []
         for j in range(number_of_nodes):
-            example_solution.append(int(random.random() * 2))
+            if random.random() < initial_adding_probability:
+                example_solution.append(1)
+            else:
+                example_solution.append(0)
+
         population.append(example_solution)
 
     fitness_values = [0.0 for x in range(population_size)]
@@ -72,21 +86,35 @@ def main():
         # repair population ----------------------------------------------
         # O(|V| * |V| * population_size)
         for i in population:
-            repair_solution_2(i, adjacency_matrix, vertex_weights)
-            # repair_solution_1(i, adjacency_matrix, vertex_weights)
-            # repair_solution_0(i, adjacency_matrix)
+            if repair_function_type == 0:
+                repair_solution_0(i, adjacency_matrix)
+            elif repair_function_type == 1:
+                repair_solution_1(i, adjacency_matrix, vertex_weights)
+            elif repair_function_type == 2:
+                repair_solution_2(i, adjacency_matrix, vertex_weights)
+            else:
+                print("ops error")
+                exit(1)
         # ----------------------------------------------------------------
         # evaluate fitness & selecting probabilities & find get best------
         # O(|V| * population_size)
         sum_of_fitness_values = 0
+        sum_of_fitness_values_exp = 0
         for i in range(population_size):
             fitness_values[i] = calculate_fitness(population[i], vertex_weights)
             sum_of_fitness_values += fitness_values[i]
+            if temperature >= 0:
+                sum_of_fitness_values_exp = math.exp(fitness_values[i] / temperature)
         cumsum = 0
+        cumsum_exp = 0
         current_best = -1.0
         for i in range(population_size):
-            cumsum += fitness_values[i]
-            cumulative_probabilities[i] = cumsum / sum_of_fitness_values
+            if temperature >= 0:
+                cumsum_exp += math.exp(fitness_values[i] / temperature)
+                cumulative_probabilities[i] = cumsum_exp / sum_of_fitness_values_exp
+            else:
+                cumsum += fitness_values[i]
+                cumulative_probabilities[i] = cumsum / sum_of_fitness_values
             if fitness_values[i] > maximum_fitness:
                 maximum_fitness = fitness_values[i]
                 best_solution = population[i]
@@ -142,10 +170,13 @@ def main():
             os.makedirs("../logs/" + input_file_name + "/avg")
         if not os.path.exists("../logs/" + input_file_name + "/best"):
             os.makedirs("../logs/" + input_file_name + "/best")
+        if not os.path.exists("../logs/" + input_file_name + "/best-solution"):
+            os.makedirs("../logs/" + input_file_name + "/best-solution")
 
         file_name = "../logs/" + input_file_name + "/" + "/avg/" + input_file_name + "_g" + str(
             number_of_generations) + "_p" + str(population_size) + "_c" + str(crossover_probability) + "_m" + str(
-            mutation_probability) + "_avg"
+            mutation_probability) + "_ip" + str(initial_adding_probability) + "_rp" + str(
+            repair_function_type) + "_tmp" + str(temperature) + "_avg"
         f = open(file_name + ".csv", 'w')
         for i in logs_avg:
             f.write(i)
@@ -153,13 +184,18 @@ def main():
 
         file_name = "../logs/" + input_file_name + "/" + "/best/" + input_file_name + "_g" + str(
             number_of_generations) + "_p" + str(population_size) + "_c" + str(crossover_probability) + "_m" + str(
-            mutation_probability) + "_best"
+            mutation_probability) + "_ip" + str(initial_adding_probability) + "_rp" + str(
+            repair_function_type) + "_tmp" + str(temperature) + "_best"
         f = open(file_name + ".csv", 'w')
         for i in logs_best:
             f.write(i)
         f.close()
 
-        f = open(file_name + "_solution" + ".csv", 'w')
+        file_name = "../logs/" + input_file_name + "/" + "/best-solution/" + input_file_name + "_g" + str(
+            number_of_generations) + "_p" + str(population_size) + "_c" + str(crossover_probability) + "_m" + str(
+            mutation_probability) + "_ip" + str(initial_adding_probability) + "_rp" + str(
+            repair_function_type) + "_tmp" + str(temperature) + "_best_solution"
+        f = open(file_name + ".csv", 'w')
         f.write("maximum fitness : " + str(maximum_fitness) + "\n")
         for i in best_solution:
             f.write(str(i) + "\n")
