@@ -7,7 +7,7 @@ crossover_probabilities = ["0.1", "0.3", "0.6", "0.9"]
 mutation_probabilities = ["0.2", "0.02"]
 initial_adding_probabilities = ["0.025", "0.05", "0.1", "0.2", "0.3", "0.5", "0.70", "0.85", "1"]
 temperature_size_divisor = ["-1", "3", "2", "1", "-2"]  # -1 means divide by size , -2 means use tournament method
-repair_function_types = ["2", "1", "0"]
+repair_function_types = ["0", "2"]
 
 
 # probabilities are exponentially weighted according to formula below
@@ -23,7 +23,7 @@ total_number_of_process = len(number_of_generations) + len(population_sizes) + \
                           len(initial_adding_probabilities) + len(temperature_size_divisor) +\
                           len(repair_function_types)
 
-maximum_concurrent_process = 5
+maximum_concurrent_process = 35
 created_processes_counter = 0
 
 processes = []
