@@ -142,6 +142,8 @@ def main():
             os.makedirs("../logs/" + input_file_name + "/avg")
         if not os.path.exists("../logs/" + input_file_name + "/best"):
             os.makedirs("../logs/" + input_file_name + "/best")
+            if not os.path.exists("../logs/" + input_file_name + "/best-solution"):
+                os.makedirs("../logs/" + input_file_name + "/best-solution")
 
         file_name = "../logs/" + input_file_name + "/" + "/avg/" + input_file_name + "_g" + str(
             number_of_generations) + "_p" + str(population_size) + "_c" + str(crossover_probability) + "_m" + str(
@@ -159,7 +161,10 @@ def main():
             f.write(i)
         f.close()
 
-        f = open(file_name + "_solution" + ".csv", 'w')
+        file_name = "../logs/" + input_file_name + "/" + "/best-solution/" + input_file_name + "_g" + str(
+            number_of_generations) + "_p" + str(population_size) + "_c" + str(crossover_probability) + "_m" + str(
+            mutation_probability) + "best_solution"
+        f = open(file_name + ".csv", 'w')
         f.write("maximum fitness : " + str(maximum_fitness) + "\n")
         for i in best_solution:
             f.write(str(i) + "\n")
