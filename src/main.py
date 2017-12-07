@@ -14,17 +14,15 @@ population_size = int(args[3])
 crossover_probability = float(args[4])
 mutation_probability = float(args[5])
 initial_adding_probability = float(args[6])
-temperature_size_divisor = float(args[7])
+temperature = float(args[7])
 repair_function_type = int(args[8])
-temperature = 0.0
 
-if temperature_size_divisor == -1:
-    temperature = population_size
-elif temperature_size_divisor == -2:
-    # do not use this method. Use tournament method instead
-    temperature = -1
+
+if temperature < -1:
+    # proportional to size if negative
+    temperature = population_size / -temperature
 else:
-    temperature = population_size / temperature_size_divisor
+    temperature = temperature
 
 # enable logging experiments to files
 enable_logging = 1
@@ -76,6 +74,7 @@ def main():
 
     fitness_values = [0.0 for x in range(population_size)]
     cumulative_probabilities = [0.0 for x in range(population_size)]
+    probabilities = [0.0 for x in range(population_size)]
     # ----------------------------------------------------------------
 
     # O(|V| * population_size * population_size * number_of_generations)
@@ -104,12 +103,13 @@ def main():
             fitness_values[i] = calculate_fitness(population[i], vertex_weights)
             sum_of_fitness_values += fitness_values[i]
             if temperature >= 0:
-                sum_of_fitness_values_exp = math.exp(fitness_values[i] / temperature)
+                sum_of_fitness_values_exp += math.exp(fitness_values[i] / temperature)
         cumsum = 0
         cumsum_exp = 0
         current_best = -1.0
         for i in range(population_size):
             if temperature >= 0:
+                probabilities[i] = math.exp(fitness_values[i] / temperature) / sum_of_fitness_values_exp
                 cumsum_exp += math.exp(fitness_values[i] / temperature)
                 cumulative_probabilities[i] = cumsum_exp / sum_of_fitness_values_exp
             else:
@@ -121,6 +121,11 @@ def main():
             if fitness_values[i] > current_best:
                 current_best = fitness_values[i]
         # ----------------------------------------------------------------
+
+        f = open("prob : " + str(k), 'w')
+        for i in probabilities:
+            f.write(str(i) + "\n")
+        f.close()
 
         # print & log average---------------------------------------------
         average = sum_of_fitness_values / float(len(fitness_values))
