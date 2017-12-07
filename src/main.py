@@ -122,11 +122,6 @@ def main():
                 current_best = fitness_values[i]
         # ----------------------------------------------------------------
 
-        f = open("prob : " + str(k), 'w')
-        for i in probabilities:
-            f.write(str(i) + "\n")
-        f.close()
-
         # print & log average---------------------------------------------
         average = sum_of_fitness_values / float(len(fitness_values))
         logs_avg[k] = str(average) + "\n"
