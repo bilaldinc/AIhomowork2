@@ -184,7 +184,7 @@ def main():
         file_name = "../logs/" + input_file_name + "/" + "/avg/" + input_file_name + "_g" + str(
             number_of_generations) + "_p" + str(population_size) + "_c" + str(crossover_probability) + "_m" + str(
             mutation_probability) + "_ip" + str(initial_adding_probability) + "_rp" + str(
-            repair_function_type) + "_tmp" + str(int(temperature)) + "_avg"
+            repair_function_type) + "_tmp" + "{0:.2f}".format(temperature) + "_avg"
         f = open(file_name + ".csv", 'w')
         for i in logs_avg:
             f.write(i)
@@ -193,7 +193,7 @@ def main():
         file_name = "../logs/" + input_file_name + "/" + "/best/" + input_file_name + "_g" + str(
             number_of_generations) + "_p" + str(population_size) + "_c" + str(crossover_probability) + "_m" + str(
             mutation_probability) + "_ip" + str(initial_adding_probability) + "_rp" + str(
-            repair_function_type) + "_tmp" + str(int(temperature)) + "_best"
+            repair_function_type) + "_tmp" + "{0:.2f}".format(temperature) + "_best"
         f = open(file_name + ".csv", 'w')
         for i in logs_best:
             f.write(i)
@@ -202,7 +202,7 @@ def main():
         file_name = "../logs/" + input_file_name + "/" + "/best-solution/" + input_file_name + "_g" + str(
             number_of_generations) + "_p" + str(population_size) + "_c" + str(crossover_probability) + "_m" + str(
             mutation_probability) + "_ip" + str(initial_adding_probability) + "_rp" + str(
-            repair_function_type) + "_tmp" + str(int(temperature)) + "_best_solution"
+            repair_function_type) + "_tmp" + "{0:.2f}".format(temperature) + "_best_solution"
         f = open(file_name + ".csv", 'w')
         f.write("maximum fitness : " + str(maximum_fitness) + "\n")
         for i in best_solution:
