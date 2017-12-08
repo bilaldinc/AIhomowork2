@@ -63,12 +63,20 @@ def main():
     population = []
     mating_pool = population_size * [None]
     for i in range(population_size):
-        example_solution = []
-        for j in range(number_of_nodes):
-            if random.random() < initial_adding_probability:
-                example_solution.append(1)
-            else:
-                example_solution.append(0)
+        example_solution = [0 for x in range(number_of_nodes)]
+        if initial_adding_probability is -1:
+            # random
+            cardinality_of_set = int(random.random() * number_of_nodes) + 1
+            for j in random.sample(range(0, len(number_of_nodes)), cardinality_of_set):
+                example_solution[j] = 1
+
+        else:
+            # biased random
+            for j in range(number_of_nodes):
+                if random.random() < initial_adding_probability:
+                    example_solution[j] = 1
+                else:
+                    example_solution[j] = 0
 
         population.append(example_solution)
 
