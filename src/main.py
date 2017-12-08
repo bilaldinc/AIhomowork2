@@ -55,9 +55,11 @@ def main():
     population = []
     mating_pool = population_size * [None]
     for i in range(population_size):
-        example_solution = []
-        for j in range(number_of_nodes):
-            example_solution.append(int(random.random() * 2))
+        example_solution = [0 for x in range(number_of_nodes)]
+        # random
+        cardinality_of_set = int(random.random() * number_of_nodes) + 1
+        for j in random.sample(range(0, len(number_of_nodes)), cardinality_of_set):
+            example_solution[j] = 1
         population.append(example_solution)
 
     fitness_values = [0.0 for x in range(population_size)]
