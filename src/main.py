@@ -18,12 +18,13 @@ mutation_probability = float(args[5])
 enable_logging = 1
 
 # enable stdout info
-enable_stdout = 1
+enable_stdout = 0
+
+# repair function type
+repair_function_type = 1
 
 
 def main():
-    print("hello world")
-
     # read file ------------------------------------------------------
     f = open(name_of_the_graph_file, 'r')
     lines = f.readlines()
@@ -74,9 +75,16 @@ def main():
         # repair population ----------------------------------------------
         # O(|V| * |V| * population_size)
         for i in population:
-            # repair_solution_2(i, adjacency_matrix, vertex_weights)
-            repair_solution_1(i, adjacency_matrix, vertex_weights)
-            # repair_solution_0(i, adjacency_matrix)
+            if repair_function_type == 0:
+                repair_solution_0(i, adjacency_matrix)
+            elif repair_function_type == 1:
+                repair_solution_1(i, adjacency_matrix, vertex_weights)
+            elif repair_function_type == 2:
+                repair_solution_2(i, adjacency_matrix, vertex_weights)
+            else:
+                print("ops error")
+                exit(1)
+
         # ----------------------------------------------------------------
         # evaluate fitness & selecting probabilities & find get best------
         # O(|V| * population_size)
@@ -149,7 +157,7 @@ def main():
 
         file_name = "../logs/" + input_file_name + "/" + "/avg/" + input_file_name + "_g" + str(
             number_of_generations) + "_p" + str(population_size) + "_c" + str(crossover_probability) + "_m" + str(
-            mutation_probability) + "_avg"
+            mutation_probability) + "_rp" + str(repair_function_type) + "_avg"
         f = open(file_name + ".csv", 'w')
         for i in logs_avg:
             f.write(i)
@@ -157,7 +165,7 @@ def main():
 
         file_name = "../logs/" + input_file_name + "/" + "/best/" + input_file_name + "_g" + str(
             number_of_generations) + "_p" + str(population_size) + "_c" + str(crossover_probability) + "_m" + str(
-            mutation_probability) + "_best"
+            mutation_probability) + "_rp" + str(repair_function_type) + "_best"
         f = open(file_name + ".csv", 'w')
         for i in logs_best:
             f.write(i)
@@ -165,7 +173,7 @@ def main():
 
         file_name = "../logs/" + input_file_name + "/" + "/best-solution/" + input_file_name + "_g" + str(
             number_of_generations) + "_p" + str(population_size) + "_c" + str(crossover_probability) + "_m" + str(
-            mutation_probability) + "best_solution"
+            mutation_probability) + "_rp" + str(repair_function_type) + "best_solution"
         f = open(file_name + ".csv", 'w')
         f.write("maximum fitness : " + str(maximum_fitness) + "\n")
         for i in best_solution:
