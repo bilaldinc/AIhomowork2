@@ -64,10 +64,10 @@ def main():
     mating_pool = population_size * [None]
     for i in range(population_size):
         example_solution = [0 for x in range(number_of_nodes)]
-        if initial_adding_probability is -1:
+        if initial_adding_probability == -1:
             # random
             cardinality_of_set = int(random.random() * number_of_nodes) + 1
-            for j in random.sample(range(0, len(number_of_nodes)), cardinality_of_set):
+            for j in random.sample(range(0, number_of_nodes), cardinality_of_set):
                 example_solution[j] = 1
 
         else:
