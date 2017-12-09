@@ -16,6 +16,8 @@ function [ ] = create_figures()
     
     xlabel('Generation');
     ylabel('Average Fitness');
+    ylim([0 16])
+    set(gca,'YTick',0:2:16)
     set(gcf, 'Position', [500, 500, 800, 400]);
     grid on
     legend('repair_0','repair_1','repair_2','Location','southeast')

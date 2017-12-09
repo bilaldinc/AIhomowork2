@@ -16,11 +16,11 @@ function [ ] = create_figures()
     for i=1:length(files)
         fig = figure('visible', 'off');
         plot(files_1{i,2});
-        ylim([6 14])
-        set(gca,'YTick',6:1:14)
+        ylim([9 15])
+        set(gca,'YTick',9:1:15)
         xlabel('Generation');
         ylabel('Average Fitness');
-        set(gcf, 'Position', [500, 500, 800, 500]);
+        set(gcf, 'Position', [500, 500, 800, 400]);
         grid on
         saveas(fig,strcat('figures/',files_1{i,1}),'png');
     end
