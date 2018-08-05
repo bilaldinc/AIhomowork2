@@ -5,11 +5,15 @@ Implement genetic algorithm for Maximum Weighted Independent Set Problem
 Detailed information can be found in docs directory.
 
 Comparison of repair functions
+
 ![alt text](figures/comparison.png)
 
-An example improvement of population over generations 
+An example improvement of population over generations
+
 ![alt text](figures/example.png)
 
-A table of avarege fitness 
+A table of average fitness
+
 ![alt text](figures/table.png)
+
 
